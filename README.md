@@ -22,7 +22,7 @@ Hermes-Azure is a trusted environmental monitoring system designed for supply ch
 * **Data Transmission:**
   Mobile nodes send sensor data via Bluetooth Low Energy (BLE) to a nearby **Base Node**.
 
-* **Base Node (e.g. ESP32):**
+* **Base Node:**
   Receives BLE packets and uploads the data to a **secure blockchain** over Wi-Fi, ensuring data immutability and transparency.
 
 * **M5Core2 Display Unit:**
