@@ -2,16 +2,9 @@
 
 K_MSGQ_DEFINE(ble_msgq, sizeof(struct ble_adv), 10, 4);
 
-static struct bt_le_scan_param scan_params = {
-    .type = BT_LE_SCAN_TYPE_PASSIVE,
-    .options = BT_LE_SCAN_OPT_NONE,
-    .interval = BT_GAP_SCAN_FAST_INTERVAL,
-    .window = BT_GAP_SCAN_FAST_WINDOW,
-};
-
 static uint8_t ble_data[] = {
     0xA3, 0xF9, 0xC2, 0xB7, //prefix
-    UUID[0], UUID[1], UUID[2], UUID[3], //uuid
+    UUID0, UUID1, UUID2, UUID3, //uuid
     0x00, //pressure
     0x00, //humidity
     0x00, 0x00, 0x00, //rgb
@@ -23,6 +16,7 @@ static struct bt_data ad[] = {
     BT_DATA(BT_DATA_MANUFACTURER_DATA, ble_data, sizeof(ble_data)),
 };
 //west build -b <board> <application_path> -- -D<VARIABLE_NAME>=<value>
+//west build -b thingy52/nrf52832 mobile/ --pristine -- -DUUID0=0xDE -DUUID1=0xAD -DUUID2=0xBE -DUUID3=0xEF
 
 int ble_init(void)
 {
@@ -40,6 +34,7 @@ int ble_init(void)
 
 void adv_thread(void)
 {
+    ble_init();
     printf("Advertise thread started\n");
     int err;
     struct ble_adv *current = k_malloc(sizeof(struct ble_adv));

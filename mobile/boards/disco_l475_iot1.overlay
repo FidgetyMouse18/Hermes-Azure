@@ -1,0 +1,54 @@
+&i2c2 {
+    lis3mdl_magn: lis3mdl-magn@1e {
+        compatible = "st,lis3mdl-magn";
+        reg = <0x1e>;
+    };
+    hts221: hts221@5f {
+		compatible = "st,hts221";
+		reg = <0x5f>;
+		drdy-gpios = <&gpiod 15 GPIO_ACTIVE_HIGH>;
+	};
+    lps22hb_press: lps22hb-press@5d {
+		compatible = "st,lps22hb-press";
+		reg = <0x5d>;
+	};
+};
+
+&quadspi {
+    mx25r6435f: qspi-nor-flash@90000000 {
+        partitions {
+            compatible = "fixed-partitions";
+            #address-cells = <1>;
+            #size-cells = <1>;
+
+            /delete-node/ slot1;
+                /delete-node/ slot2;
+
+                /* Redefine partitions with corrected sizes */
+                slot1: partition@0 {
+                    label = "image-1";
+                    reg = <0x00000000 DT_SIZE_K(864)>; // 864KB
+                };
+                slot2: partition@d8000 {
+                    label = "image-3";
+                    reg = <0x000d8000 DT_SIZE_M(6)>;  // 6MB (reduced from 7MB)
+                };
+                storage: partition@6D8000 {
+                    label = "storage";
+                    reg = <0x006D8000 DT_SIZE_M(1)>;   // 1MB for LittleFS
+                };
+        };
+    };
+};
+
+
+
+/ {
+    aliases {
+        mag = &lis3mdl_magn;
+        humid = &hts221;
+        temp = &hts221;
+        press = &lps22hb_press;
+		rtc = &rtc;
+    };
+};

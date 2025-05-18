@@ -1,0 +1,8 @@
+/ {
+    aliases {
+        humid = &hts221;
+        temp = &hts221;
+        press = &lps22hb_press;
+        accel = &lis2dh12;
+    };
+};
