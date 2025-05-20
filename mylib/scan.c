@@ -28,22 +28,19 @@ void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type, struct net
 
     // snprintk(uuid, sizeof(uuid), "%02X:%02X:%02X:%02X", ble.uuid[0], ble.uuid[1], ble.uuid[2], ble.uuid[3]);
 
-    // if (ble.prefix[0] != 0xA3 || ble.prefix[1] != 0xF9 || ble.prefix[2] != 0xC2 || ble.prefix[3] != 0xB7)
-    // {
-    //     return;
-    // }
-        if (ble.company_code[0] != 0x4C || ble.company_code[1] != 0x00 )
+    if (ble.prefix[0] != 0xA3 || ble.prefix[1] != 0xF9 || ble.prefix[2] != 0xC2 || ble.prefix[3] != 0xB7)
     {
         return;
     }
 
     printk("*** Data Received ***\n");
     printk("UUID: %02X:%02X:%02X:%02X\n", ble.uuid[0], ble.uuid[1], ble.uuid[2], ble.uuid[3]);
-    printk("Company: %02X:%02X\n", ble.company_code[0], ble.company_code[1]);
     printk("Humidity: %d\n", ble.humidity);
     printk("Pressure: %d\n", ble.pressure);
-    printk("Temperature: %d\n\n", ble.temperature);
+    printk("Temperature: %d\n", ble.temperature);
+    printk("TVOC: %d\n", ble.tvoc);
     printk("X: %d    Y: %d    Z: %d\n", ble.accel_x, ble.accel_y, ble.accel_z);
+    printk("R: %d    G: %d    B: %d\n", ble.r, ble.g, ble.b);
     k_msleep(1000);
 }
 

@@ -4,7 +4,6 @@ K_MSGQ_DEFINE(ble_msgq, sizeof(struct ble_adv), 10, 4);
 
 static uint8_t ble_data[] = {
 
-    0x4C, 0x00,                 // company code
     0xA3, 0xF9, 0xC2, 0xB7,     // prefix
     UUID0, UUID1, UUID2, UUID3, // uuid
     0x00,                       // pressure
@@ -71,17 +70,17 @@ void adv_thread(void)
                 printf("Failed to stop Adv (err %d)\n", err);
             }
 
-            ble_data[10] = current->pressure;
-            ble_data[11] = current->humidity;
-            ble_data[12] = current->humidity;
-            ble_data[13] = current->r;
-            ble_data[14] = current->g;
-            ble_data[15] = current->b;
-            ble_data[16] = (current->tvoc >> 8) & 0xFF;
-            ble_data[17] = current->tvoc & 0xFF;
-            ble_data[18] = current->accel_x;
-            ble_data[19] = current->accel_y;
-            ble_data[20] = current->accel_z;
+            ble_data[8] = current->pressure;
+            ble_data[9] = current->humidity;
+            ble_data[10] = current->temperature;
+            ble_data[11] = current->r;
+            ble_data[12] = current->g;
+            ble_data[13] = current->b;
+            ble_data[14] = current->tvoc & 0xFF;
+            ble_data[15] = (current->tvoc >> 8) & 0xFF;
+            ble_data[16] = current->accel_x;
+            ble_data[17] = current->accel_y;
+            ble_data[18] = current->accel_z;
 
             printf("*** Transmitting ***\n");
             printf("Humidity: %d\n", current->humidity);

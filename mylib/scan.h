@@ -12,10 +12,9 @@
 #define STACKSIZE 4096
 #define PRIORITY 7
 
-struct ble_adv
+struct __packed  ble_adv
 {
     uint8_t ble_prefix[5];
-    uint8_t company_code[2];
     uint8_t prefix[4];
     uint8_t uuid[4];
     uint8_t pressure;

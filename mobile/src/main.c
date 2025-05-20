@@ -44,10 +44,10 @@ void run(void)
 		accel_z = (int8_t)accel_data.z;
 
 		//TEMP
-		r = 0;
-		g = 0;
-		b = 0;
-		tvoc = 0;
+		r = 127;
+		g = 12;
+		b = 94;
+		tvoc = 1143;
 
 		// printf("Humidity: %d\n", humidity);
 		// printf("Pressure: %d\n", pressure);
