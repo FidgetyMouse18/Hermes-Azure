@@ -1,9 +1,9 @@
 #include "../../mylib/advertise.h"
-// #include "../../mylib/sensors/accel.h"
-// #include "../../mylib/sensors/humid.h"
-#include "../../mylib/sensors/light.h"
-// #include "../../mylib/sensors/press.h"
-// #include "../../mylib/sensors/temp.h"
+#include "../../mylib/sensors/accel.h"
+#include "../../mylib/sensors/humid.h"
+// #include "../../mylib/sensors/light.h"
+#include "../../mylib/sensors/press.h"
+#include "../../mylib/sensors/temp.h"
 #include <zephyr/drivers/gpio.h>
 
 #define LED0_NODE DT_ALIAS(led0)
@@ -11,9 +11,6 @@ static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 
 int main(void)
 {
-	// accel_init();
-
-	// light_init();
 
 	if (!gpio_is_ready_dt(&led))
 	{
@@ -28,24 +25,39 @@ int main(void)
 void run(void)
 {
 	float data;
-	struct light_data data2;
-	// struct accel_data data3;
+	uint8_t pressure, humidity, temperature, r, g, b, accel_x, accel_y, accel_z;
+	uint16_t tvoc;
+	// struct light_data light_data;
+	struct accel_data accel_data;
 	while (1)
 	{
-		printf("Fetching Data\n");
-		// humid_get(&data);
-		// printf("Humidity: %.2f\n", data);
-		// press_get(&data);
-		// printf("Pressure: %.2f\n", data);
-		// temp_get(&data);
-		// printf("Temperature: %.2f\n\n", data);
+		// printf("Fetching Data\n");
+		humid_get(&data);
+		humidity = (uint8_t)data;
+		press_get(&data);
+		pressure = (uint8_t)data;
+		temp_get(&data);
+		temperature = (uint8_t)data;
+		accel_get(&accel_data);
+		accel_x = (int8_t)accel_data.x;
+		accel_y = (int8_t)accel_data.y;
+		accel_z = (int8_t)accel_data.z;
 
-		light_get(&data2);
-		printf("R: %d    G: %d    B: %d    W: %d\n", data2.r, data2.g, data2.b, data2.w);
+		//TEMP
+		r = 0;
+		g = 0;
+		b = 0;
+		tvoc = 0;
 
-		// accel_get(&data3);
-		// printf("X: %.2f    Y: %.2f    Z: %.2f\n", data3.x, data3.y, data3.z);
-		k_msleep(2000);
+		// printf("Humidity: %d\n", humidity);
+		// printf("Pressure: %d\n", pressure);
+		// printf("Temperature: %d\n\n", temperature);
+		// printf("X: %d    Y: %d    Z: %d\n", accel_x, accel_y, accel_z);
+
+		// light_get(&data2);
+		// printf("R: %d    G: %d    B: %d    W: %d\n", data2.r, data2.g, data2.b, data2.w);
+		queue_data(pressure, humidity, temperature, r, g, b, tvoc, accel_x, accel_y, accel_z);
+		k_msleep(150);
 	}
 }
 
