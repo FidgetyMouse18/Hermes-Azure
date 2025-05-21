@@ -1,7 +1,7 @@
 #include "../../mylib/advertise.h"
 #include "../../mylib/sensors/accel.h"
 #include "../../mylib/sensors/humid.h"
-// #include "../../mylib/sensors/light.h"
+#include "../../mylib/sensors/light.h"
 #include "../../mylib/sensors/press.h"
 #include "../../mylib/sensors/temp.h"
 #include <zephyr/drivers/gpio.h>
@@ -27,7 +27,7 @@ void run(void)
 	float data;
 	uint8_t pressure, humidity, temperature, r, g, b, accel_x, accel_y, accel_z;
 	uint16_t tvoc;
-	// struct light_data light_data;
+	struct light_data light_data;
 	struct accel_data accel_data;
 	while (1)
 	{
@@ -54,9 +54,9 @@ void run(void)
 		// printf("Temperature: %d\n\n", temperature);
 		// printf("X: %d    Y: %d    Z: %d\n", accel_x, accel_y, accel_z);
 
-		// light_get(&data2);
-		// printf("R: %d    G: %d    B: %d    W: %d\n", data2.r, data2.g, data2.b, data2.w);
-		queue_data(pressure, humidity, temperature, r, g, b, tvoc, accel_x, accel_y, accel_z);
+		// light_get(&light_data);
+		// printf("R: %d    G: %d    B: %d    W: %d\n", light_data.r, light_data.g, light_data.b, light_data.w);
+		// queue_data(pressure, humidity, temperature, r, g, b, tvoc, accel_x, accel_y, accel_z);
 		k_msleep(150);
 	}
 }

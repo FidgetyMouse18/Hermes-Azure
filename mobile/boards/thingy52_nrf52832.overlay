@@ -1,4 +1,21 @@
-/ {
+
+&i2c0 {
+    status = "okay";
+
+    bh1745: bh1745@38 {
+        // compatible = "rohm,bh1745";
+        reg = <0x38>;
+
+        /* P0.30 is the sensor‑rail switch (VDD_PWD_CTRL) */
+        power-gpios = <&gpio0 30 GPIO_ACTIVE_HIGH>;
+
+        /* optional – the colour sensor INT line is P0.31 */
+        int-gpios   = <&gpio0 31 GPIO_ACTIVE_LOW>;
+        label = "BH1745";
+    };
+};
+
+/{
     aliases {
         humid = &hts221;
         temp = &hts221;
