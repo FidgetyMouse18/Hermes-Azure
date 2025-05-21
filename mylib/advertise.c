@@ -1,6 +1,6 @@
 #include "advertise.h"
 
-K_MSGQ_DEFINE(ble_msgq, sizeof(struct ble_adv), 10, 4);
+K_MSGQ_DEFINE(ble_msgq, sizeof(struct ble_adv), 2, 4);
 
 static uint8_t ble_data[] = {
 
@@ -9,7 +9,7 @@ static uint8_t ble_data[] = {
     0x00,                       // pressure
     0x00,                       // humidity
     0x00,                       // temperature
-    0x00, 0x00, 0x00,           // rgb
+    0x00, 0x00, 0x00, 0x00,     // rgbw
     0x00, 0x00,                 // tvoc
     0x00, 0x00, 0x00            // acceleration
 };
@@ -82,11 +82,11 @@ void adv_thread(void)
             ble_data[17] = current->accel_y;
             ble_data[18] = current->accel_z;
 
-            printf("*** Transmitting ***\n");
-            printf("Humidity: %d\n", current->humidity);
-            printf("Pressure: %d\n", current->pressure);
-            printf("Temperature: %d\n\n", current->temperature);
-            printf("X: %d    Y: %d    Z: %d\n", current->accel_x, current->accel_y, current->accel_z);
+            // printf("*** Transmitting ***\n");
+            // printf("Humidity: %d\n", current->humidity);
+            // printf("Pressure: %d\n", current->pressure);
+            // printf("Temperature: %d\n\n", current->temperature);
+            // printf("X: %d    Y: %d    Z: %d\n", current->accel_x, current->accel_y, current->accel_z);
             err = bt_le_adv_start(BT_LE_ADV_NCONN, ad, ARRAY_SIZE(ad), NULL, 0);
             if (err)
             {

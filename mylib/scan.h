@@ -11,7 +11,7 @@
 
 #define STACKSIZE 4096
 #define PRIORITY 7
-
+#define SCAN_TIME 1000
 struct __packed  ble_adv
 {
     uint8_t ble_prefix[5];

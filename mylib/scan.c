@@ -9,7 +9,7 @@ static struct bt_le_scan_param scan_params = {
 
 void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type, struct net_buf_simple *buf)
 {
-    char uuid[32];
+    // char uuid[32];
 
     // if (adv_type != BT_GAP_ADV_TYPE_ADV_IND)
     // {
@@ -41,7 +41,7 @@ void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type, struct net
     printk("TVOC: %d\n", ble.tvoc);
     printk("X: %d    Y: %d    Z: %d\n", ble.accel_x, ble.accel_y, ble.accel_z);
     printk("R: %d    G: %d    B: %d\n", ble.r, ble.g, ble.b);
-    k_msleep(1000);
+    // k_msleep(1000);
 }
 
 void scan_thread(void)
@@ -61,7 +61,7 @@ void scan_thread(void)
     while (1)
     {
         bt_le_scan_start(&scan_params, scan_cb);
-        k_msleep(10);
+        k_msleep(SCAN_TIME);
     }
 }
 

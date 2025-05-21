@@ -1,5 +1,4 @@
 #include "light.h"
-#include <zephyr/drivers/gpio.h>
 
 const struct device *i2c_dev = DEVICE_DT_GET(DT_NODELABEL(i2c0));
 
@@ -30,41 +29,17 @@ int light_init(void)
     }
 
     k_msleep(10);
-    int ret;
-    // uint8_t part_id = 0;
-    // i2c_reg_read_byte(i2c_dev, BH1745_I2C_ADDR, 0x40, &part_id);
-    // printf("BH1745 Part ID: 0x%02X\n", part_id);
-    // Software reset
-    ret = bh1745_write_reg(0x40, 0x80);
-    if (ret < 0)
-        return ret;
-    k_msleep(10);
-    printf("Reset\n");
 
-    // Set measurement time and gain
-    ret = bh1745_write_reg(0x41, 0x10); // 160ms, 1x gain
-    if (ret < 0)
-        return ret;
-    printf("Gain\n");
+    bh1745_write_reg(REG_SYS_CTRL, 0x80);
+    k_msleep(2);
+    bh1745_write_reg(REG_SYS_CTRL, 0x00);
 
-    // Enable RGB measurement
-    ret = bh1745_write_reg(0x42, 0x02);
-    if (ret < 0)
-        return ret;
-    printf("RGB\n");
-
-    // Set measurement mode
-    ret = bh1745_write_reg(0x44, 0x02);
-    if (ret < 0)
-        return ret;
-    printf("Mode\n");
+    uint8_t cfg[] = {REG_MODECTL1, 0x00, /* 160 ms IT  */
+                     0x10,               /* gain 1× + RGBC_EN */
+                     0x02};              /* START conversions  */
+    i2c_write(i2c_dev, cfg, sizeof(cfg), BH1745_I2C_ADDR);
 
     k_msleep(200);
-
-    // uint8_t part_id = 0;
-    // i2c_reg_read_byte(i2c_dev, BH1745_I2C_ADDR, 0x92, &part_id);
-    // printf("BH1745 Part ID: 0x%02X\n", part_id);
-    // k_msleep(20000);
 
     return 0;
 }
@@ -95,7 +70,13 @@ void light_thread(void)
             printk("Error 2 - %d\n", ret);
             continue;
         }
-		printf("R: %d    G: %d    B: %d    W: %d\n", data.r, data.g, data.b, data.w);
+
+        //convert to lux
+        data.r = (uint8_t)(data.r * 0.4f);
+        data.g = (uint8_t)(data.g * 0.4f);
+        data.b = (uint8_t)(data.b * 0.4f);
+        data.w = (uint8_t)(data.w * 0.4f);
+
         while (k_msgq_put(&light_msgq, &data, K_NO_WAIT) != 0)
         {
             k_msgq_purge(&light_msgq);

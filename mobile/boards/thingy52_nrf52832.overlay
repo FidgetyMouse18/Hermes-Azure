@@ -21,5 +21,6 @@
         temp = &hts221;
         press = &lps22hb_press;
         accel = &lis2dh12;
+        tvoc = &ccs811;
     };
 };
