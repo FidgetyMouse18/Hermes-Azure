@@ -32,7 +32,7 @@ void temp_thread(void)
         ret = sensor_sample_fetch(temp);
         if (ret)
         {
-            printk("Error 1 - %d\n", ret);
+            printk("Temp Error 1 - %d\n", ret);
             continue;
         }
 
@@ -54,5 +54,4 @@ void temp_thread(void)
     }
 }
 
-K_THREAD_DEFINE(temp_id, STACKSIZE, temp_thread, NULL, NULL, NULL,
-                PRIORITY-1, 0, 0);
+// K_THREAD_DEFINE(temp_id, STACKSIZE, temp_thread, NULL, NULL, NULL, PRIORITY-1, 0, 0);

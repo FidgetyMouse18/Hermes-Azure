@@ -14,8 +14,9 @@ FILE(GLOB temp ../mylib/sensors/temp.c)
 FILE(GLOB accel ../mylib/sensors/accel.c)
 FILE(GLOB light ../mylib/sensors/light.c)
 FILE(GLOB tvoc ../mylib/sensors/tvoc.c)
+FILE(GLOB mic ../mylib/sensors/mic.c)
 
-target_sources(app PRIVATE ${app_sources} ${advertise} ${humid} ${press} ${temp} ${accel} ${light} ${tvoc})
+target_sources(app PRIVATE ${app_sources} ${advertise} ${humid} ${press} ${temp} ${accel} ${light} ${tvoc} ${mic})
 
 target_include_directories(app PRIVATE ../mylib)
 

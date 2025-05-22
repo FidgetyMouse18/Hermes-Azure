@@ -67,7 +67,7 @@ void light_thread(void)
 
         if (ret)
         {
-            printk("Error 2 - %d\n", ret);
+            printk("Light Error 2 - %d\n", ret);
             continue;
         }
 
@@ -84,5 +84,4 @@ void light_thread(void)
     }
 }
 
-K_THREAD_DEFINE(light_id, STACKSIZE, light_thread, NULL, NULL, NULL,
-                PRIORITY - 1, 0, 0);
+// K_THREAD_DEFINE(light_id, STACKSIZE, light_thread, NULL, NULL, NULL, PRIORITY - 1, 0, 0);

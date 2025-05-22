@@ -32,7 +32,7 @@ void humid_thread(void)
         ret = sensor_sample_fetch(humid);
         if (ret)
         {
-            printk("Error 1 - %d\n", ret);
+            printk("Humid Error 1 - %d\n", ret);
             continue;
         }
 
@@ -54,5 +54,4 @@ void humid_thread(void)
     }
 }
 
-K_THREAD_DEFINE(humid_id, STACKSIZE, humid_thread, NULL, NULL, NULL,
-                PRIORITY-1, 0, 0);
+// K_THREAD_DEFINE(humid_id, STACKSIZE, humid_thread, NULL, NULL, NULL, PRIORITY-1, 0, 0);

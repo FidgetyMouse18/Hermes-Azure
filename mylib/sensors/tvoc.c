@@ -32,7 +32,7 @@ void tvoc_thread(void)
         ret = sensor_sample_fetch(tvoc);
         if (ret)
         {
-            printk("Error 1 - %d\n", ret);
+            printk("TVOC Error 1 - %d\n", ret);
             continue;
         }
 
@@ -54,5 +54,4 @@ void tvoc_thread(void)
     }
 }
 
-K_THREAD_DEFINE(tvoc_id, STACKSIZE, tvoc_thread, NULL, NULL, NULL,
-                PRIORITY-1, 0, 0);
+// K_THREAD_DEFINE(tvoc_id, STACKSIZE, tvoc_thread, NULL, NULL, NULL, PRIORITY-1, 0, 0);

@@ -32,7 +32,7 @@ void press_thread(void)
         ret = sensor_sample_fetch(press);
         if (ret)
         {
-            printk("Error 1 - %d\n", ret);
+            printk("Press Error 1 - %d\n", ret);
             continue;
         }
 
@@ -54,5 +54,4 @@ void press_thread(void)
     }
 }
 
-K_THREAD_DEFINE(press_id, STACKSIZE, press_thread, NULL, NULL, NULL,
-                PRIORITY-1, 0, 0);
+// K_THREAD_DEFINE(press_id, STACKSIZE, press_thread, NULL, NULL, NULL, PRIORITY-1, 0, 0);
