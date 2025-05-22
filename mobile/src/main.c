@@ -60,7 +60,7 @@ void run(void)
 		// light_get(&light_data);
 		mic_read(&data);
 
-		printf("Sound: %0.2fdB\n", data);
+		// printf("Sound: %0.2fdB\n", data);
 
 		// printf("Humidity: %d\n", humidity);
 		// printf("Pressure: %d\n", pressure);
@@ -69,8 +69,8 @@ void run(void)
 		// printf("R: %d    G: %d    B: %d    W: %d\n", light_data.r, light_data.g, light_data.b, light_data.w);
 
 		// queue_data(pressure, humidity, temperature, light_data.r, light_data.g, light_data.b, tvoc, accel_x, accel_y, accel_z);
-		// k_msleep(10);
-		k_msleep(1000);
+		k_msleep(10);
+		// k_msleep(5000);
 	}
 }
 
