@@ -60,4 +60,4 @@ void accel_thread(void)
     }
 }
 
-// K_THREAD_DEFINE(accel_id, STACKSIZE, accel_thread, NULL, NULL, NULL, PRIORITY-1, 0, 0);
+K_THREAD_DEFINE(accel_id, STACKSIZE, accel_thread, NULL, NULL, NULL, PRIORITY-1, 0, 0);

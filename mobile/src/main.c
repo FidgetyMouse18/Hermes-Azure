@@ -5,7 +5,6 @@
 #include "../../mylib/sensors/press.h"
 #include "../../mylib/sensors/temp.h"
 #include "../../mylib/sensors/tvoc.h"
-#include "../../mylib/sensors/mic.h"
 #include <zephyr/drivers/gpio.h>
 
 #define LED0_NODE DT_ALIAS(led0)
@@ -40,25 +39,25 @@ void run(void)
 	uint16_t tvoc;
 	struct light_data light_data;
 	struct accel_data accel_data;
+	uint16_t counter = 0;
 
-	mic_init();
 	while (1)
 	{
 		// printf("Fetching Data\n");
-		// humid_get(&data);
-		// humidity = (uint8_t)data;
-		// press_get(&data);
-		// pressure = (uint8_t)data;
-		// temp_get(&data);
-		// temperature = (uint8_t)data;
-		// tvoc_get(&data);
-		// tvoc = (uint16_t)data;
-		// accel_get(&accel_data);
-		// accel_x = (int8_t)accel_data.x;
-		// accel_y = (int8_t)accel_data.y;
-		// accel_z = (int8_t)accel_data.z;
-		// light_get(&light_data);
-		mic_read(&data);
+		humid_get(&data);
+		humidity = (uint8_t)data;
+		press_get(&data);
+		pressure = (uint8_t)data;
+		temp_get(&data);
+		temperature = (uint8_t)data;
+		tvoc_get(&data);
+		tvoc = (uint16_t)data;
+		accel_get(&accel_data);
+		accel_x = (int8_t)accel_data.x;
+		accel_y = (int8_t)accel_data.y;
+		accel_z = (int8_t)accel_data.z;
+		light_get(&light_data);
+		// mic_read(&data);
 
 		// printf("Sound: %0.2fdB\n", data);
 
@@ -68,8 +67,9 @@ void run(void)
 		// printf("X: %d    Y: %d    Z: %d\n", accel_x, accel_y, accel_z);
 		// printf("R: %d    G: %d    B: %d    W: %d\n", light_data.r, light_data.g, light_data.b, light_data.w);
 
-		// queue_data(pressure, humidity, temperature, light_data.r, light_data.g, light_data.b, tvoc, accel_x, accel_y, accel_z);
-		k_msleep(10);
+		queue_data(counter, pressure, humidity, temperature, light_data.r, light_data.g, light_data.b, tvoc, accel_x, accel_y, accel_z);
+		counter++;
+		k_msleep(ADVERTISE_MS);
 		// k_msleep(5000);
 	}
 }

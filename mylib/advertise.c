@@ -6,10 +6,11 @@ static uint8_t ble_data[] = {
 
     0xA3, 0xF9, 0xC2, 0xB7,     // prefix
     UUID0, UUID1, UUID2, UUID3, // uuid
+    0x00, 0x00,                 // timestamp
     0x00,                       // pressure
     0x00,                       // humidity
     0x00,                       // temperature
-    0x00, 0x00, 0x00, 0x00,     // rgbw
+    0x00, 0x00, 0x00,           // rgb
     0x00, 0x00,                 // tvoc
     0x00, 0x00, 0x00            // acceleration
 };
@@ -21,9 +22,10 @@ static struct bt_data ad[] = {
 // west build -b <board> <application_path> -- -D<VARIABLE_NAME>=<value>
 // west build -b thingy52/nrf52832 mobile/ --pristine -- -DUUID0=0xDE -DUUID1=0xAD -DUUID2=0xBE -DUUID3=0xEF
 
-void queue_data(uint8_t pressure, uint8_t humidity, uint8_t temeprature, uint8_t r, uint8_t g, uint8_t b, uint16_t tvoc, int8_t accel_x, int8_t accel_y, int8_t accel_z)
+void queue_data(uint16_t timestamp, uint8_t pressure, uint8_t humidity, uint8_t temeprature, uint8_t r, uint8_t g, uint8_t b, uint16_t tvoc, int8_t accel_x, int8_t accel_y, int8_t accel_z)
 {
     struct ble_adv data = {
+        .timestamp = timestamp,
         .pressure = pressure,
         .humidity = humidity,
         .temperature = temeprature,
@@ -69,24 +71,25 @@ void adv_thread(void)
             {
                 printf("Failed to stop Adv (err %d)\n", err);
             }
+            ble_data[8] = current->timestamp & 0xFF;
+            ble_data[9] = (current->timestamp >> 8) & 0xFF;
+            ble_data[10] = current->pressure;
+            ble_data[11] = current->humidity;
+            ble_data[12] = current->temperature;
+            ble_data[13] = current->r;
+            ble_data[14] = current->g;
+            ble_data[15] = current->b;
+            ble_data[16] = current->tvoc & 0xFF;
+            ble_data[17] = (current->tvoc >> 8) & 0xFF;
+            ble_data[18] = current->accel_x;
+            ble_data[19] = current->accel_y;
+            ble_data[20] = current->accel_z;
 
-            ble_data[8] = current->pressure;
-            ble_data[9] = current->humidity;
-            ble_data[10] = current->temperature;
-            ble_data[11] = current->r;
-            ble_data[12] = current->g;
-            ble_data[13] = current->b;
-            ble_data[14] = current->tvoc & 0xFF;
-            ble_data[15] = (current->tvoc >> 8) & 0xFF;
-            ble_data[16] = current->accel_x;
-            ble_data[17] = current->accel_y;
-            ble_data[18] = current->accel_z;
-
-            // printf("*** Transmitting ***\n");
-            // printf("Humidity: %d\n", current->humidity);
-            // printf("Pressure: %d\n", current->pressure);
-            // printf("Temperature: %d\n\n", current->temperature);
-            // printf("X: %d    Y: %d    Z: %d\n", current->accel_x, current->accel_y, current->accel_z);
+            printf("*** Transmitting ***\n");
+            printf("Humidity: %d\n", current->humidity);
+            printf("Pressure: %d\n", current->pressure);
+            printf("Temperature: %d\n\n", current->temperature);
+            printf("X: %d    Y: %d    Z: %d\n", current->accel_x, current->accel_y, current->accel_z);
             err = bt_le_adv_start(BT_LE_ADV_NCONN, ad, ARRAY_SIZE(ad), NULL, 0);
             if (err)
             {
@@ -97,5 +100,4 @@ void adv_thread(void)
     }
 }
 
-K_THREAD_DEFINE(adv_id, STACKSIZE, adv_thread, NULL, NULL, NULL,
-                PRIORITY, 0, 0);
+K_THREAD_DEFINE(adv_id, STACKSIZE, adv_thread, NULL, NULL, NULL, PRIORITY, 0, 0);

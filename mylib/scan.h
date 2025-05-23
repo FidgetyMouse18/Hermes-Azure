@@ -11,12 +11,13 @@
 
 #define STACKSIZE 4096
 #define PRIORITY 7
-#define SCAN_TIME 1000
+#define SCAN_TIME 100
 struct __packed  ble_adv
 {
     uint8_t ble_prefix[5];
     uint8_t prefix[4];
     uint8_t uuid[4];
+    uint16_t timestamp;
     uint8_t pressure;
     uint8_t humidity;
     uint8_t temperature;

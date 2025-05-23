@@ -2,7 +2,7 @@
 
 static struct bt_le_scan_param scan_params = {
     .type = BT_LE_SCAN_TYPE_PASSIVE,
-    .options = BT_LE_SCAN_OPT_NONE,
+    .options = BT_LE_SCAN_OPT_NONE | BT_LE_SCAN_OPT_FILTER_DUPLICATE,
     .interval = BT_GAP_SCAN_FAST_INTERVAL,
     .window = BT_GAP_SCAN_FAST_WINDOW,
 };
@@ -35,6 +35,7 @@ void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type, struct net
 
     printk("*** Data Received ***\n");
     printk("UUID: %02X:%02X:%02X:%02X\n", ble.uuid[0], ble.uuid[1], ble.uuid[2], ble.uuid[3]);
+    printk("TimeStamp: %d\n", ble.timestamp);
     printk("Humidity: %d\n", ble.humidity);
     printk("Pressure: %d\n", ble.pressure);
     printk("Temperature: %d\n", ble.temperature);

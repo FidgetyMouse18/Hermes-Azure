@@ -54,4 +54,4 @@ void press_thread(void)
     }
 }
 
-// K_THREAD_DEFINE(press_id, STACKSIZE, press_thread, NULL, NULL, NULL, PRIORITY-1, 0, 0);
+K_THREAD_DEFINE(press_id, STACKSIZE, press_thread, NULL, NULL, NULL, PRIORITY-1, 0, 0);

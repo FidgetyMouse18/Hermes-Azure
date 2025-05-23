@@ -54,4 +54,4 @@ void humid_thread(void)
     }
 }
 
-// K_THREAD_DEFINE(humid_id, STACKSIZE, humid_thread, NULL, NULL, NULL, PRIORITY-1, 0, 0);
+K_THREAD_DEFINE(humid_id, STACKSIZE, humid_thread, NULL, NULL, NULL, PRIORITY-1, 0, 0);

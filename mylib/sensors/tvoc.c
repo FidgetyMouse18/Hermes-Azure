@@ -54,4 +54,4 @@ void tvoc_thread(void)
     }
 }
 
-// K_THREAD_DEFINE(tvoc_id, STACKSIZE, tvoc_thread, NULL, NULL, NULL, PRIORITY-1, 0, 0);
+K_THREAD_DEFINE(tvoc_id, STACKSIZE, tvoc_thread, NULL, NULL, NULL, PRIORITY-1, 0, 0);
