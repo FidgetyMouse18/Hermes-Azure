@@ -31,7 +31,6 @@
     };
 };
 
-
 /{
     aliases {
         humid = &hts221;
