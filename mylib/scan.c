@@ -33,6 +33,24 @@ void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type, struct net
         return;
     }
 
+    int ret = check_node(ble.uuid, ble.timestamp);
+    switch (ret)
+    {
+    case 0:
+        return;
+        break;
+    case -2:
+        node_remove(ble.uuid);
+        node_add(ble.uuid, ble.timestamp);
+        break;
+    case -1:
+        node_add(ble.uuid, ble.timestamp);
+        break;
+
+    default:
+        break;
+    }
+
     printk("*** Data Received ***\n");
     printk("UUID: %02X:%02X:%02X:%02X\n", ble.uuid[0], ble.uuid[1], ble.uuid[2], ble.uuid[3]);
     printk("TimeStamp: %d\n", ble.timestamp);

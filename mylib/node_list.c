@@ -4,14 +4,14 @@ sys_dlist_t node_list = SYS_DLIST_STATIC_INIT(&node_list);
 
 int node_add(const uint8_t *uuid, const uint16_t timestamp)
 {
-    struct node_node *current;
-    SYS_DLIST_FOR_EACH_CONTAINER(&node_list, current, node)
-    {
-        if (memcmp(current->uuid, uuid, BLE_UUID_LEN) == 0)
-        {
-            return -EEXIST;
-        }
-    }
+    // struct node_node *current;
+    // SYS_DLIST_FOR_EACH_CONTAINER(&node_list, current, node)
+    // {
+    //     if (memcmp(current->uuid, uuid, BLE_UUID_LEN) == 0)
+    //     {
+    //         return -EEXIST;
+    //     }
+    // }
 
     struct node_node *new_node = k_malloc(sizeof(struct node_node));
     if (!new_node)

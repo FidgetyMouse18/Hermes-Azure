@@ -7,7 +7,8 @@ project(DT3BASE)
 FILE(GLOB app_sources src/*.c)
 
 FILE(GLOB scan ../mylib/scan.c)
+FILE(GLOB node_list ../mylib/node_list.c)
 
-target_sources(app PRIVATE ${app_sources} ${scan})
+target_sources(app PRIVATE ${app_sources} ${scan} ${node_list})
 
 target_include_directories(app PRIVATE ../mylib)

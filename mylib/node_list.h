@@ -19,9 +19,8 @@ struct node_node
 };
 
 extern sys_dlist_t node_list;
-int node_add(const char *name, const uint8_t *mac, uint16_t major, uint16_t minor,
-                float x, float y, const char *left, const char *right);
-int node_remove(const uint8_t *mac);
+int node_add(const uint8_t *uuid, const uint16_t timestamp);
+int node_remove(const uint8_t *uuid);
 int check_node(const uint8_t *uuid, const uint16_t timestamp);
 
 #endif

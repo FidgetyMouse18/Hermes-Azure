@@ -8,6 +8,7 @@
 #include <math.h>
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/settings/settings.h>
+#include "node_list.h"
 
 #define STACKSIZE 4096
 #define PRIORITY 7
