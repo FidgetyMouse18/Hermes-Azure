@@ -3,7 +3,6 @@
 
 #include <zephyr/kernel.h>
 
-
 /**
  * @brief Initialize Wi-Fi management event callbacks.
  */
@@ -28,10 +27,6 @@ void wifi_wait_for_ip_addr(void);
  *
  * @return 0 on success, negative error code on failure.
  */
-int wifi_disconnect(void);
+int wifi_disconnect(void); 
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* WIFI_H */ 
+#endif /* WIFI_H */
