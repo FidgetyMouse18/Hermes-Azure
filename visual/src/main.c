@@ -5,6 +5,7 @@
 #include <zephyr/logging/log.h>
 #include <lvgl.h>
 #include <stdio.h>
+#include "wifi.h"
 
 LOG_MODULE_REGISTER(app, CONFIG_LOG_DEFAULT_LEVEL);
 
@@ -17,6 +18,8 @@ static lv_obj_t *tileview;
 static lv_obj_t *tap_btn;        
 static uint8_t   current_tile;
 static uint32_t  last_click_ms;  
+static struct k_thread ui_thread_data;
+static k_tid_t ui_thread_id;
 
 
 static void screen_tap_cb(lv_event_t *e)
@@ -91,4 +94,40 @@ static void ui_thread()
     }
 }
 
-K_THREAD_DEFINE(ui_thread_id, STACK_SIZE_UI, ui_thread, NULL, NULL, NULL, PRIORITY_UI, 0, 0);
+
+
+K_THREAD_STACK_DEFINE(ui_stack, STACK_SIZE_UI);
+
+int main(void) {
+    wifi_init();
+
+    printk("here\n");
+
+    // 2) join your network (blocks until associated)
+    int rc = wifi_connect("Melrose", "Marinuca");
+    if (rc) {
+        LOG_ERR("Wi-Fi connect failed: %d", rc);
+        return rc;
+    }
+
+    // 3) wait until you actually get an IP
+    wifi_wait_for_ip_addr();
+
+    // Start UI thread after WiFi connection is established
+    ui_thread_id = k_thread_create(&ui_thread_data,
+                                 ui_stack,
+                                 STACK_SIZE_UI,
+                                 ui_thread,
+                                 NULL,
+                                 NULL,
+                                 NULL,
+                                 PRIORITY_UI,
+                                 0,
+                                 K_NO_WAIT);
+    if (ui_thread_id == NULL) {
+        LOG_ERR("Failed to create UI thread");
+        return -ENOMEM;
+    }
+
+    return 0;
+}
