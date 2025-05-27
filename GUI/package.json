@@ -1,0 +1,21 @@
+{
+  "name": "GUI",
+  "version": "1.0.0",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "electron": "^35.1.3"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.8",
+    "electron-debug": "^4.1.0",
+    "serialport": "^13.0.0",
+    "@hyperledger/fabric-gateway": "^1.7.1"
+  }
+}

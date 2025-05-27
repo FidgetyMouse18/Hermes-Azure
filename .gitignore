@@ -148,3 +148,4 @@ node_modules/
 .vscode
 .west
 bootloader
+vendor
