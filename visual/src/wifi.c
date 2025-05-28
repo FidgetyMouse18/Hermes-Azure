@@ -4,6 +4,10 @@
 #include <zephyr/net/net_mgmt.h>
 #include <zephyr/net/wifi_mgmt.h>
 #include <zephyr/net/net_if.h>
+#include <zephyr/net/socket.h>
+#include <errno.h>
+#include <string.h>
+#include <stdio.h>
 
 LOG_MODULE_REGISTER(wifi, LOG_LEVEL_INF);
 
@@ -114,4 +118,70 @@ int wifi_disconnect(void)
         return -ENODEV;
     }
     return net_mgmt(NET_REQUEST_WIFI_DISCONNECT, iface, NULL, 0);
+}
+
+int http_get(const char *ip, uint16_t port, const char *path, char* response)
+{
+    int sock, ret;
+    struct sockaddr_in addr;
+    char request[256];
+    char recv_buf[512];
+
+    sock = zsock_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (sock < 0) {
+        LOG_ERR("Failed to create socket (%d)", sock);
+        return sock;
+    }
+
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(port);
+    ret = zsock_inet_pton(AF_INET, ip, &addr.sin_addr);
+    if (ret < 0) {
+        LOG_ERR("Invalid IPv4 address: %s (%d)", ip, ret);
+        zsock_close(sock);
+        return ret;
+    }
+
+    ret = zsock_connect(sock, (struct sockaddr *)&addr, sizeof(addr));
+    if (ret < 0) {
+        LOG_ERR("Socket connect failed (%d)", ret);
+        zsock_close(sock);
+        return ret;
+    }
+
+    snprintf(request, sizeof(request),
+             "GET %s HTTP/1.1\r\n"
+             "Host: %s:%u\r\n"
+             "Connection: close\r\n"
+             "\r\n", path, ip, port);
+    ret = zsock_send(sock, request, strlen(request), 0);
+    if (ret < 0) {
+        LOG_ERR("Failed to send HTTP request (%d)", ret);
+        zsock_close(sock);
+        return ret;
+    }
+
+    while ((ret = zsock_recv(sock, recv_buf, sizeof(recv_buf) - 1, 0)) > 0) {
+        recv_buf[ret] = '\0';
+        char *line = strtok(recv_buf, "\r\n");
+        char *last_line = NULL;
+        
+        while (line != NULL) {
+            last_line = line;
+            line = strtok(NULL, "\r\n");
+        }
+        
+        if (last_line != NULL) {
+            strcpy(response, last_line);
+        }
+    }
+
+    if (ret < 0) {
+        LOG_ERR("HTTP recv failed (%d)", ret);
+    }
+
+    zsock_close(sock);
+
+    return (ret < 0) ? ret : 0;
 }
