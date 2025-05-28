@@ -1,0 +1,8 @@
+/*
+ * Device tree overlay for M5Stack Core2 visual project
+ * Ensures vibration motor (AXP192 LDO3) is properly configured
+ */
+
+&vib_motor {
+    status = "okay";
+}; 
