@@ -4,6 +4,7 @@
 #include <zephyr/drivers/display.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/data/json.h>
+#include <zephyr/arch/arch_interface.h>
 #include <lvgl.h>
 #include <stdio.h>
 #include <string.h>
@@ -17,6 +18,9 @@ LOG_MODULE_REGISTER(app, CONFIG_LOG_DEFAULT_LEVEL);
 #define STACK_SIZE_WIFI 8192
 #define PRIORITY_WIFI    7
 
+// Message queue for sensor data communication between threads
+K_MSGQ_DEFINE(sensor_msgq, sizeof(struct sensor_data), 10, 4);
+
 static void ui_thread()
 {
     const struct device *disp = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
@@ -29,6 +33,19 @@ static void ui_thread()
     display_blanking_off(disp);
 
     while (1) {
+        // Check for new sensor data
+        struct sensor_data data;
+        if (k_msgq_get(&sensor_msgq, &data, K_NO_WAIT) == 0) {
+            // Update UI with new sensor data
+            ui_env_set_temp(data.temperature);
+            ui_env_set_hum(data.humidity);
+            ui_env_set_press(data.pressure);
+            ui_env_set_tvoc(data.tvoc);
+            ui_motion_set_xyz(data.accel_x, data.accel_y, data.accel_z);
+            ui_light_set_rgb(data.r, data.g, data.b);
+            
+        }
+        
         lv_timer_handler();
         k_msleep(10);
     }
@@ -36,7 +53,6 @@ static void ui_thread()
 
 static void wifi_thread() {
     char response[1024];
-    // memset(response, 0, 1024);
     while (1) {
         int rc = http_get("192.168.0.49", 3000, "/device/ABC123", response);
         if (rc) {
@@ -49,10 +65,18 @@ static void wifi_thread() {
             if (err < 0) {
                 LOG_ERR("JSON parse failed: %d", err);
             } else {
-                LOG_ERR("Parsed data: pressure=%u humidity=%u temperature=%u r=%u g=%u b=%u tvoc=%u accel_x=%d accel_y=%d accel_z=%d",
+                LOG_INF("Parsed data: pressure=%u humidity=%u temperature=%u r=%u g=%u b=%u tvoc=%u accel_x=%d accel_y=%d accel_z=%d",
                         data.pressure, data.humidity, data.temperature,
                         data.r, data.g, data.b, data.tvoc,
                         data.accel_x, data.accel_y, data.accel_z);
+                
+                // Send sensor data to UI thread via message queue
+                if (k_msgq_put(&sensor_msgq, &data, K_NO_WAIT) != 0) {
+                    // Queue is full, purge and try again
+                    k_msgq_purge(&sensor_msgq);
+                    k_msgq_put(&sensor_msgq, &data, K_NO_WAIT);
+                    LOG_WRN("Sensor message queue was full, purged old data");
+                }
             }
         }
         k_msleep(5000);
