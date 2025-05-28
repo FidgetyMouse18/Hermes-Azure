@@ -15,18 +15,19 @@ Hermes-Azure is a trusted environmental monitoring system designed for supply ch
 
   * Temperature
   * Humidity
-  * Gas levels
-  * CO₂ concentration
-  * Magnetic interference
+  * Pressure
+  * TVOC levels
+  * RGB light levels
+  * X, Y, Z Acceleration
 
 * **Data Transmission:**
   Mobile nodes send sensor data via Bluetooth Low Energy (BLE) to a nearby **Base Node**.
 
 * **Base Node:**
-  Receives BLE packets and uploads the data to a **secure blockchain** over Wi-Fi, ensuring data immutability and transparency.
+  Receives BLE packets and uploads the data to a **secure blockchain** over Wi-Fi via a HTTP Rest Endpoint, ensuring data immutability and transparency.
 
 * **M5Core2 Display Unit:**
-  Can access the data via Wi-Fi or directly receive BLE packets. It displays real-time graphs representing the environmental snapshot.
+  Can access the data using Wi-Fi via a HTTP Rest Endpoint. It displays real-time graphs representing the environmental snapshot.
 
 * **Desktop Dashboard:**
   Provides a more detailed interface for visualizing historical and live data from across the entire supply chain.
