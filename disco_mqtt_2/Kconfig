@@ -1,0 +1,72 @@
+# SPDX-License-Identifier: Apache-2.0
+
+mainmenu "Disco MQTT 2 Application Configuration"
+
+config NET_SAMPLE_MQTT_BROKER_HOSTNAME
+	string "MQTT broker hostname"
+	default "test.mosquitto.org"
+	help
+	  Hostname of the MQTT broker to connect to.
+
+config NET_SAMPLE_MQTT_BROKER_PORT
+	string "MQTT broker port"
+	default "1883"
+	help
+	  Port number of the MQTT broker.
+
+config NET_SAMPLE_MQTT_PUB_TOPIC
+	string "MQTT publish topic"
+	default "disco/sensors"
+	help
+	  MQTT topic to publish sensor data to.
+
+config NET_SAMPLE_MQTT_SUB_TOPIC_CMD
+	string "MQTT subscribe topic for commands"
+	default "disco/commands"
+	help
+	  MQTT topic to subscribe to for receiving commands.
+
+config NET_SAMPLE_MQTT_PUBLISH_INTERVAL
+	int "MQTT publish interval (seconds)"
+	default 5
+	range 1 3600
+	help
+	  Interval between MQTT sensor data publications.
+
+config NET_SAMPLE_MQTT_PAYLOAD_SIZE
+	int "MQTT payload buffer size"
+	default 512
+	range 128 2048
+	help
+	  Size of the MQTT payload buffer in bytes.
+
+choice NET_SAMPLE_MQTT_QOS
+	prompt "MQTT QoS level"
+	default NET_SAMPLE_MQTT_QOS_1_AT_LEAST_ONCE
+	help
+	  Select the MQTT Quality of Service level.
+
+config NET_SAMPLE_MQTT_QOS_0_AT_MOST_ONCE
+	bool "QoS 0 - At most once"
+
+config NET_SAMPLE_MQTT_QOS_1_AT_LEAST_ONCE
+	bool "QoS 1 - At least once"
+
+config NET_SAMPLE_MQTT_QOS_2_EXACTLY_ONCE
+	bool "QoS 2 - Exactly once"
+
+endchoice
+
+config WIFI_SSID
+	string "WiFi SSID"
+	default "ss Wireless"
+	help
+	  WiFi network SSID to connect to.
+
+config WIFI_PASSWORD
+	string "WiFi Password"
+	default "Vivian1123"
+	help
+	  WiFi network password.
+
+source "Kconfig.zephyr" 
