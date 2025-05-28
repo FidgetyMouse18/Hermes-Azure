@@ -13,7 +13,7 @@
 #define STACKSIZE 4096
 #define PRIORITY 7
 
-#define ADVERTISE_MS 10000
+#define ADVERTISE_MS 5000
 
 struct __aligned(4) ble_adv
 {

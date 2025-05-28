@@ -90,7 +90,7 @@ async function getData(uuid) {
         addData(rgbChart, g, 1);
         addData(rgbChart, b, 2);
 
-        let timestamps = readings.map(r => Number(r.timestamp));
+        let timestamps = readings.map(r => (new Date(Number(r.timestamp))).toLocaleString());
         addLabel(timestamps);
     } finally {
         gateway.close();
@@ -272,7 +272,7 @@ function addData(chart, newData, index) {
                 scales: {
                     y: {
                         suggestedMin: 0,
-                        suggestedMax: 2000,
+                        suggestedMax: 500,
                         ticks: {
                             callback: function (value) {
                                 return value + 'ppb';
@@ -327,3 +327,17 @@ function addData(chart, newData, index) {
         }
     );
 })();
+
+const intervalId = setInterval(async () => {
+  try {
+    const selectedValues = Array.from(dropdown.selectedOptions)
+        .map(option => option.value);
+    console.log("Running");
+    selectedValues.forEach(async uuid => {
+        // console.log(uuid);
+        await getData(uuid);
+    });
+  } catch (err) {
+    console.error('Task failed:', err);
+  }
+}, 5000);

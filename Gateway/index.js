@@ -37,9 +37,9 @@ app.get('/device/:uuid', async (req, res) => {
                 jsonStr.split(',').map(n => parseInt(n, 10)));
             jsonStr = Buffer.from(byteArray).toString('utf8');
         }
-
+        // console.log(jsonStr);
         const readings = JSON.parse(jsonStr);
-        res.json(readings);
+        res.json(readings[readings.length - 1]);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
@@ -48,12 +48,26 @@ app.get('/device/:uuid', async (req, res) => {
 
 app.post('/reading', async (req, res) => {
     const r = req.body;
+    const timestamp = new Date().getTime();
+    r.timestamp = timestamp;
+    console.log(r);
+
+    const output = Object.fromEntries(
+        Object.entries(r).map(([key, val]) => [
+            key,
+            (typeof val === 'string' && val.trim() !== '' && !isNaN(val))
+                ? Number(val)
+                : val
+        ])
+    );
+    console.log(JSON.stringify(output));
+
     try {
         await contract.submitTransaction(
             'CreateReading',
             r.uuid,
-            String(r.timestamp),
-            JSON.stringify(r)
+            String(timestamp),
+            JSON.stringify(output)
         );
         res.json({ status: 'committed' });
     } catch (err) {

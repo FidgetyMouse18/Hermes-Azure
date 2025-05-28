@@ -9,8 +9,9 @@
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/settings/settings.h>
 #include "node_list.h"
+#include "wifi.h"
 
-#define STACKSIZE 4096
+#define STACKSIZE 8192
 #define PRIORITY 7
 #define SCAN_TIME 100
 struct __packed  ble_adv

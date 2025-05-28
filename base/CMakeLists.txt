@@ -8,7 +8,8 @@ FILE(GLOB app_sources src/*.c)
 
 FILE(GLOB scan ../mylib/scan.c)
 FILE(GLOB node_list ../mylib/node_list.c)
+FILE(GLOB wifi ../mylib/wifi.c)
 
-target_sources(app PRIVATE ${app_sources} ${scan} ${node_list})
+target_sources(app PRIVATE ${app_sources} ${scan} ${node_list} ${wifi})
 
 target_include_directories(app PRIVATE ../mylib)

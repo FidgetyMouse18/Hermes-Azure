@@ -1,3 +1,4 @@
+#include "wifi.h"
 #include <zephyr/kernel.h>
 #include <zephyr/net/mqtt.h>
 #include <zephyr/net/socket.h>
@@ -12,50 +13,13 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
-LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
+LOG_MODULE_REGISTER(wifi, LOG_LEVEL_INF);
 
-/* ====== EDIT THESE BEFORE BUILD ====== */
 #define WIFI_SSID   "csse4011"
 #define WIFI_PASS   "csse4011wifi"
-// #define BROKER_ADDR "192.168.0.253"
-// #define BROKER_PORT 1883
-/* ==================================== */
-
-// Structure to hold parsed sensor data
-struct sensor_data {
-    char *uuid;
-    uint64_t timestamp;
-    uint8_t pressure;
-    uint8_t humidity;
-    uint8_t temperature;
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-    uint16_t tvoc;
-    int8_t accel_x;
-    int8_t accel_y;
-    int8_t accel_z;
-};
-
-// JSON descriptor for sensor_data
-static const struct json_obj_descr sensor_descr[] = {
-    JSON_OBJ_DESCR_PRIM(struct sensor_data, uuid, JSON_TOK_STRING),
-    JSON_OBJ_DESCR_PRIM(struct sensor_data, timestamp, JSON_TOK_UINT64),
-    JSON_OBJ_DESCR_PRIM(struct sensor_data, pressure,  JSON_TOK_NUMBER),
-    JSON_OBJ_DESCR_PRIM(struct sensor_data, humidity,  JSON_TOK_NUMBER),
-    JSON_OBJ_DESCR_PRIM(struct sensor_data, temperature, JSON_TOK_NUMBER),
-    JSON_OBJ_DESCR_PRIM(struct sensor_data, r,         JSON_TOK_NUMBER),
-    JSON_OBJ_DESCR_PRIM(struct sensor_data, g,         JSON_TOK_NUMBER),
-    JSON_OBJ_DESCR_PRIM(struct sensor_data, b,         JSON_TOK_NUMBER),
-    JSON_OBJ_DESCR_PRIM(struct sensor_data, tvoc,      JSON_TOK_NUMBER),
-    JSON_OBJ_DESCR_PRIM(struct sensor_data, accel_x,   JSON_TOK_NUMBER),
-    JSON_OBJ_DESCR_PRIM(struct sensor_data, accel_y,   JSON_TOK_NUMBER),
-    JSON_OBJ_DESCR_PRIM(struct sensor_data, accel_z,   JSON_TOK_NUMBER),
-};
-
 
 static struct mqtt_client client;
-static uint8_t rx_buf[2048], tx_buf[2048];
+static uint8_t rx_buf[2048], tx_buf[1024];
 static struct sockaddr_storage broker;
 
 static struct k_sem wifi_scan_done;
@@ -160,16 +124,12 @@ static int wifi_connect(void)
     return 0;
 }
 
-
-
-
-
-int http_get(const char *ip, uint16_t port, const char *path, char* response)
+int http_post(const char *ip, uint16_t port, const char *path, char* data)
 {
     int sock, ret;
     struct sockaddr_in addr;
-    char request[256];
-    char recv_buf[512];
+    char request[512];
+    // char recv_buf[512];
 
     sock = zsock_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (sock < 0) {
@@ -195,34 +155,18 @@ int http_get(const char *ip, uint16_t port, const char *path, char* response)
     }
 
     snprintf(request, sizeof(request),
-             "GET %s HTTP/1.1\r\n"
+             "POST %s HTTP/1.1\r\n"
+             "Content-Type: application/json\r\n"
              "Host: %s:%u\r\n"
-             "Connection: close\r\n"
-             "\r\n", path, ip, port);
+             "Content-Length: %d\r\n\r\n"
+             "%s\r\n"
+             "\r\n", path, ip, port, strlen(data), data);
+    printk("%s\n", request);
     ret = zsock_send(sock, request, strlen(request), 0);
     if (ret < 0) {
         LOG_ERR("Failed to send HTTP request (%d)", ret);
         zsock_close(sock);
         return ret;
-    }
-
-    while ((ret = zsock_recv(sock, recv_buf, sizeof(recv_buf) - 1, 0)) > 0) {
-        recv_buf[ret] = '\0';
-        char *line = strtok(recv_buf, "\r\n");
-        char *last_line = NULL;
-        
-        while (line != NULL) {
-            last_line = line;
-            line = strtok(NULL, "\r\n");
-        }
-        
-        if (last_line != NULL) {
-            strcpy(response, last_line);
-        }
-    }
-
-    if (ret < 0) {
-        LOG_ERR("HTTP recv failed (%d)", ret);
     }
 
     zsock_close(sock);
@@ -235,13 +179,8 @@ int http_get(const char *ip, uint16_t port, const char *path, char* response)
 
 
 
-
-
-
-
-int main(void)
-{
-    LOG_INF("Starting WiFi initialization for scanning...");
+void wifi_init(void) {
+LOG_INF("Starting WiFi initialization for scanning...");
     int wifi_scan_result = wifi_scan();
     if (wifi_scan_result != 0) {
         LOG_ERR("WiFi scan failed.");
@@ -278,28 +217,34 @@ int main(void)
         LOG_ERR("No IP address assigned after 30 seconds");
         return -1;
     }
-    char response[1024];
-
-    while (1) {
-        int rc = http_get("192.168.0.49", 3000, "/device/ABC123", response);
-        if (rc) {
-            LOG_ERR("HTTP GET failed: %d", rc);
-        } else {
-            struct sensor_data data;
-            int err = json_obj_parse(response, strlen(response),
-                                     sensor_descr, ARRAY_SIZE(sensor_descr),
-                                     &data);
-            if (err < 0) {
-                LOG_ERR("JSON parse failed: %d", err);
-            } else {
-                LOG_ERR("Parsed data: pressure=%u humidity=%u temperature=%u r=%u g=%u b=%u tvoc=%u accel_x=%d accel_y=%d accel_z=%d",
-                        data.pressure, data.humidity, data.temperature,
-                        data.r, data.g, data.b, data.tvoc,
-                        data.accel_x, data.accel_y, data.accel_z);
-            }
-        }
-        k_sleep(K_MSEC(5000));
-    }
-    return 0;
 }
+
+
+
+// int main(void)
+// {
+//     char response[1024];
+
+//     while (1) {
+//         int rc = http_get("192.168.0.49", 3000, "/device/ABC123", response);
+//         if (rc) {
+//             LOG_ERR("HTTP GET failed: %d", rc);
+//         } else {
+//             struct sensor_data data;
+//             int err = json_obj_parse(response, strlen(response),
+//                                      sensor_descr, ARRAY_SIZE(sensor_descr),
+//                                      &data);
+//             if (err < 0) {
+//                 LOG_ERR("JSON parse failed: %d", err);
+//             } else {
+//                 LOG_ERR("Parsed data: pressure=%u humidity=%u temperature=%u r=%u g=%u b=%u tvoc=%u accel_x=%d accel_y=%d accel_z=%d",
+//                         data.pressure, data.humidity, data.temperature,
+//                         data.r, data.g, data.b, data.tvoc,
+//                         data.accel_x, data.accel_y, data.accel_z);
+//             }
+//         }
+//         k_sleep(K_MSEC(5000));
+//     }
+//     return 0;
+// }
 

@@ -12,7 +12,7 @@ const createWindow = () => {
     win.maximize();
     win.loadFile('src/index.html');
 }
-require('electron-debug').default();
+// require('electron-debug').default();
 app.on('ready', () => {
 
     createWindow();
